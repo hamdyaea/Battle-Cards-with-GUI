@@ -6,7 +6,7 @@
 
 This game is the battle card game with a gui in Python 3.
 
-![Screenshot](screenshot.png)  
+![Screenshot](Screenshot.png)  
 
 
 ## What you need to make it work :  
