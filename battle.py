@@ -1,6 +1,6 @@
 # Developer : Hamdy Abou El Anein
 # This card game is made in Python 3 with the easygui library
-# You play againt the computer and the first without card loose the game
+# You play againt the computer and the first without card lose the game
 
 
 from easygui import *
@@ -8,7 +8,7 @@ import random
 import sys
 
 picwin = "./Pictures/winner.jpg"
-picloose = "./Pictures/gameover.jpg"
+piclose = "./Pictures/gameover.jpg"
 Pic2carreaux = "./Pictures/2Carreaux.jpg"
 Pic2coeur = "./Pictures/2Coeur.jpg"
 Pic2piques = "./Pictures/2Piques.jpg"  # trop petite image
@@ -459,7 +459,7 @@ def GameBattle():
 
         battleList.clear()
         Image = image1,image2
-        msg = "                    You loose the battle, we continue the game\n\n\n              "+str("\n\n Your cards : ") + str(len(usrCards)) + str("\n\n\n Computer cards : ") + str(len(cpuCards))+str("\n\n\n           User cards                                    Computer cards")
+        msg = "                    You lose the battle, we continue the game\n\n\n              "+str("\n\n Your cards : ") + str(len(usrCards)) + str("\n\n\n Computer cards : ") + str(len(cpuCards))+str("\n\n\n           User cards                                    Computer cards")
         choices = ["Continue"]
         result = buttonbox(msg, image=Image, choices=choices)
         if result == "Continue":
@@ -1164,9 +1164,9 @@ def Game():
     random.shuffle(usrCards)
 
     if len(usrCards) == 0:
-        msg = "\n\n\n                   You loose ! The computer have all your cards !"
+        msg = "\n\n\n                   You lose ! The computer have all your cards !"
         choices = ["OK"]
-        result = buttonbox(msg, image=picloose, choices=choices)
+        result = buttonbox(msg, image=piclose, choices=choices)
         if result == "OK":
             sys.exit(0)
         else:
@@ -1546,7 +1546,7 @@ def Game():
 
 
         Image = image1,image2
-        msg =  msg = "                              You loose\n\n\n              "+str("\n\n Your cards : ") + str(len(usrCards)) + str("\n\n\n Computer cards : ") + str(len(cpuCards))+str("\n\n\n           User cards                                    Computer cards")
+        msg =  msg = "                              You lose\n\n\n              "+str("\n\n Your cards : ") + str(len(usrCards)) + str("\n\n\n Computer cards : ") + str(len(cpuCards))+str("\n\n\n           User cards                                    Computer cards")
         choices = ["Continue"]
         result = buttonbox(msg, image=Image, choices=choices)
         if result == "Continue":
