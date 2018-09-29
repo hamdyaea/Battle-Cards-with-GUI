@@ -1,6 +1,6 @@
 # Developer : Hamdy Abou El Anein
 # This card game is made in Python 3 with the easygui library
-# You play againt the computer and the first without card lose the game
+# You play against the computer and the first without card lose the game
 
 
 from easygui import *
