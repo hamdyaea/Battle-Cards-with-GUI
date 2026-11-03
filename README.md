@@ -1,34 +1,36 @@
-[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)  
+# Battle Cards — Python War Game
 
-# Battle card game
+Developer: Hamdy Abou El Anein
+Contact: hamdy.aea@protonmail.com
+License: GNU GPL v3 (see LICENSE).
 
-## What's this game ?  
+A classic 52-card **War** game against the computer, rewritten with
+Tkinter instead of EasyGUI. The original artwork is retained and shown
+using Pillow. Original images may have separate third-party rights;
+this rewrite does not claim authorship of those images.
 
-This game is the battle card game with a gui in Python 3.
-
-![Screenshot](Screenshot.png)  
-
-
-## What you need to make it work :  
-
-This game is made for Python 3.  
-
-Install all the packages for : Python 3.  
-
-easygui at least version 0.98  
+## Run
 
 ```sh
-sudo python3 -m pip install --upgrade easygui  
-```  
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+python battle.py
+```
 
+Tkinter must be installed by your Linux distribution (usually `tk`).
+The interface offers **Play round** and **New game**. Higher-ranked
+cards win each round; equal ranks trigger a war with three face-down
+cards before the next comparison. The winner collects the contested cards.
 
-## How to launch this game :  
+## Testing
 
 ```sh
-python3 battle.py
-```  
+python3 -m unittest discover -s tests -v
+```
 
+Five offline tests check all 52 card images, unique decks, conservation
+of cards over thousands of rounds, tied-card wars and invalid cards.
+The Tkinter GUI was also launched, played one round and reset on Manjaro.
 
-## Developer - Author  
-
-Hamdy Abou El Anein  
+The original 2019 EasyGUI implementation remains in branch `old`.
