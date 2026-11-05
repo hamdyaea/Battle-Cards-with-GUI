@@ -22,7 +22,9 @@ Tkinter must be installed by your Linux distribution (usually `tk`).
 The interface offers **Play round** and **New game**. Ranks from highest to lowest are
 Ace, King, Queen, Jack, 10, 9, 8, 7, 6, 5, 4, 3, 2. On a tie, each player
 places one card face down and turns over the next. Another tie repeats this
-sequence on the same pile. The higher revealed card wins the entire pile.
+sequence on the same pile. Click **Continue battle** to place the hidden cards,
+then click again to reveal the next pair. After each round, scroll through
+the captured cards to see their pictures and English names. The higher revealed card wins the entire pile.
 
 ## Testing
 

@@ -60,6 +60,23 @@ class BattleTests(unittest.TestCase):
                 self.assertEqual(outcome.cards_at_stake, len(stake))
                 self.assertEqual(set(list(game.player)[-len(stake):]), stake)
 
+    def test_double_battle_steps(self):
+        game = self.deal([8, 14, 9, 2, 13], [8, 3, 9, 4, 12])
+        pile = tuple(card for pair in zip(list(game.player)[:5], list(game.computer)[:5])
+                     for card in pair)
+        steps = list(game.round_steps())
+        self.assertEqual([step.cards_at_stake for step in steps], [2, 4, 6, 8, 10])
+        self.assertEqual([step.player_card for step in steps],
+                         [pile[0], None, pile[4], None, pile[8]])
+        self.assertTrue(all(step.winner is None and not step.collected for step in steps[:-1]))
+        self.assertEqual(steps[-1].collected, pile)
+        self.assertEqual(steps[-1].winner, "player")
+
+    def test_english_names(self):
+        for rank, suit, name in [(14, "Coeur", "Ace of Hearts"), (13, "Piques", "King of Spades"),
+                                 (12, "Carreaux", "Queen of Diamonds"), (11, "treffles", "Jack of Clubs")]:
+            self.assertEqual(Card(rank, suit).name, name)
+
     def test_rank_order(self):
         ranks = [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2]
         for high, low in zip(ranks, ranks[1:]):

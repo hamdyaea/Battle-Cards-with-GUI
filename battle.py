@@ -33,10 +33,11 @@ class BattleWindow(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Battle Cards — War")
-        self.geometry("740x540")
-        self.minsize(600, 460)
+        self.geometry("780x710")
+        self.minsize(640, 640)
         self.configure(bg="#132236")
         self.game = BattleGame()
+        self.steps = None
         self.images: list[object] = []
         self._setup()
         self._update_scores()
@@ -70,7 +71,14 @@ class BattleWindow(tk.Tk):
         self.play_button.pack(side="left", padx=8)
         ttk.Button(controls, text="New game", command=self.new_game).pack(side="left", padx=8)
         self.counter = ttk.Label(frame, text="Round 0")
-        self.counter.pack(pady=12)
+        self.counter.pack(pady=4)
+        self.gallery = tk.Canvas(frame, height=110, highlightthickness=0)
+        self.gallery.pack(fill="x")
+        self.scroll = ttk.Scrollbar(frame, orient="horizontal", command=self.gallery.xview)
+        self.scroll.pack(fill="x")
+        self.gallery.configure(xscrollcommand=self.scroll.set)
+        self.prize_images = []
+
 
     def _show_card(self, card: Card | None, label: ttk.Label, name: ttk.Label):
         if card is None:
@@ -95,34 +103,67 @@ class BattleWindow(tk.Tk):
                                    f"Computer: {len(self.game.computer)} cards")
         self.counter.configure(text=f"Round {self.game.rounds}")
 
+    def _clear_prize(self):
+        self.gallery.delete("all")
+        self.gallery.xview_moveto(0)
+        self.prize_images.clear()
+        self.gallery.configure(scrollregion=(0, 0, 0, 110))
+
+    def _show_prize(self, cards):
+        for index, card in enumerate(cards):
+            x = 65 + index * 130
+            try:
+                from PIL import Image, ImageTk
+                with Image.open(PICTURES / image_filename(card)) as source:
+                    source.thumbnail((64, 80))
+                    photo = ImageTk.PhotoImage(source.copy())
+                self.prize_images.append(photo)
+                self.gallery.create_image(x, 42, image=photo)
+            except (ImportError, OSError):
+                pass
+            self.gallery.create_text(x, 96, text=card.name)
+        self.gallery.configure(scrollregion=(0, 0, len(cards) * 130, 110))
+
     def play_round(self):
-        if self.game.winner is not None:
-            return
-        outcome = self.game.play_round()
+        if self.steps is None:
+            if self.game.winner is not None:
+                return
+            self._clear_prize()
+            self.steps = self.game.round_steps()
+        outcome = next(self.steps)
         for card, (image, label) in zip(
             (outcome.player_card, outcome.computer_card), self.card_views
         ):
-            self._show_card(card, image, label)
-        prefix = "WAR! " if outcome.war else ""
-        if outcome.game_over:
-            self.message.configure(text=f"Game over: {self.game.winner} wins!"
-                                   if self.game.winner != "draw" else "Game over: draw!")
-            self.play_button.configure(state="disabled")
+            if card is None:
+                image.configure(image="", text="🂠", font=("DejaVu Sans", 90))
+                label.configure(text="Face down")
+            else:
+                self._show_card(card, image, label)
+        if outcome.winner is None:
+            self.play_button.configure(text="Continue battle")
+            action = ("Tie! Continue the battle." if outcome.player_card
+                      else "One card each, face down.")
+            self.message.configure(text=f"{action}   Cards in pile: {outcome.cards_at_stake}")
         else:
-            who = {"player": "You win", "computer": "Computer wins",
-                   "draw": "Draw"}[outcome.winner]
-            self.message.configure(text=f"{prefix}{who} this round "
-                                        f"({outcome.cards_at_stake} cards).")
+            self.steps = None
+            who = {"player": "You won", "computer": "Computer won",
+                   "draw": "Both players split"}[outcome.winner]
+            ending = " Game over." if outcome.game_over else ""
+            self.message.configure(text=f"{who} the pile of {outcome.cards_at_stake} cards.{ending}")
+            self.play_button.configure(text="Play round", state="disabled" if outcome.game_over else "normal")
+            self._show_prize(outcome.collected)
         self._update_scores()
 
     def new_game(self):
         self.game = BattleGame()
+        self.steps = None
+        self._clear_prize()
         self.images.clear()
         for image, label in self.card_views:
-            image.configure(image="", text="?")
+            image.configure(image="", text="?", font="TkDefaultFont")
             label.configure(text="Face down")
         self.message.configure(text="Click Play round to start")
-        self.play_button.configure(state="normal")
+        self.play_button.configure(text="Play round", state="normal")
         self._update_scores()
 
 

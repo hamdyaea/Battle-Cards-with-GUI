@@ -25,8 +25,9 @@ class Card:
 
     @property
     def name(self) -> str:
-        faces = {11: "Valet", 12: "Reine", 13: "Roi", 14: "As"}
-        return f"{faces.get(self.rank, self.rank)} {self.suit}"
+        faces = {11: "Jack", 12: "Queen", 13: "King", 14: "Ace"}
+        suits = dict(zip(SUITS, ("Diamonds", "Hearts", "Spades", "Clubs")))
+        return f"{faces.get(self.rank, self.rank)} of {suits[self.suit]}"
 
 
 @dataclass(frozen=True)
@@ -37,6 +38,7 @@ class Round:
     war: bool
     cards_at_stake: int
     game_over: bool
+    collected: tuple[Card, ...] = ()
 
 
 class BattleGame:
@@ -61,6 +63,13 @@ class BattleGame:
         return None
 
     def play_round(self) -> Round:
+        for step in self.round_steps():
+            if step.winner is not None:
+                return step
+        raise RuntimeError("Round ended without a result")
+
+    def round_steps(self):
+        """Pause after tied pairs and hidden placements before awarding the pile."""
         if self.winner is not None:
             raise RuntimeError("Game is already over")
         self.rounds += 1
@@ -82,12 +91,15 @@ class BattleGame:
                 winner = "computer"
                 break
             war = True
+            yield Round(player_face, computer_face, None, True, len(pile), False)
             # Each player stakes one hidden card before the next comparison.
             if self.player and self.computer:
                 pile.extend((self.player.popleft(), self.computer.popleft()))
+                yield Round(None, None, None, True, len(pile), False)
             if not self.player or not self.computer:
                 winner = "player" if self.player else "computer" if self.computer else "draw"
                 break
+        collected = tuple(pile)
         if winner == "player":
             self.rng.shuffle(pile)
             self.player.extend(pile)
@@ -101,5 +113,5 @@ class BattleGame:
             self.player.extend(pile[:half])
             self.computer.extend(pile[half:])
         assert len(self.player) + len(self.computer) == 52, "Lost or duplicated cards"
-        return Round(player_face, computer_face, winner, war, len(pile),
-                     self.winner is not None)
+        yield Round(player_face, computer_face, winner, war, len(pile),
+                     self.winner is not None, collected)
