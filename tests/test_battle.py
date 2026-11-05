@@ -33,26 +33,39 @@ class BattleTests(unittest.TestCase):
                 self.assertEqual(len(set(cards)), 52)
                 self.assertEqual(result.game_over, game.winner is not None)
 
-    def test_war_takes_all_staked_cards(self):
+    def deal(self, player_ranks, computer_ranks):
         game = BattleGame(seed=3)
-        game.player = deque([Card(8, "Coeur"), Card(2, "Coeur"),
-                             Card(3, "Coeur"), Card(4, "Coeur"),
-                             Card(13, "Coeur")])
-        game.computer = deque([Card(8, "Piques"), Card(2, "Piques"),
-                               Card(3, "Piques"), Card(4, "Piques"),
-                               Card(12, "Piques")])
-        # Complete the two decks with the other 42 distinct cards.
+        game.player = deque(Card(rank, "Coeur") for rank in player_ranks)
+        game.computer = deque(Card(rank, "Piques") for rank in computer_ranks)
         used = set(game.player) | set(game.computer)
         rest = [Card(rank, suit) for rank in RANKS for suit in SUITS
                 if Card(rank, suit) not in used]
-        game.player.extend(rest[:21])
-        game.computer.extend(rest[21:])
-        outcome = game.play_round()
-        self.assertTrue(outcome.war)
-        self.assertEqual(outcome.winner, "player")
-        self.assertEqual(outcome.cards_at_stake, 10)
-        self.assertEqual(len(game.player), 31)
-        self.assertEqual(len(game.computer), 21)
+        split = 26 - len(game.player)
+        game.player.extend(rest[:split])
+        game.computer.extend(rest[split:])
+        return game
+
+    def test_war_takes_all_staked_cards(self):
+        for player, computer in [
+            ([8, 2, 13], [8, 14, 12]),
+            ([8, 2, 9, 3, 13], [8, 14, 9, 10, 12]),
+        ]:
+            with self.subTest(player=player):
+                game = self.deal(player, computer)
+                stake = set(list(game.player)[:len(player)] +
+                            list(game.computer)[:len(computer)])
+                outcome = game.play_round()
+                self.assertTrue(outcome.war)
+                self.assertEqual(outcome.winner, "player")
+                self.assertEqual(outcome.cards_at_stake, len(stake))
+                self.assertEqual(set(list(game.player)[-len(stake):]), stake)
+
+    def test_rank_order(self):
+        ranks = [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2]
+        for high, low in zip(ranks, ranks[1:]):
+            with self.subTest(high=high, low=low):
+                self.assertEqual(self.deal([high], [low]).play_round().winner, "player")
+                self.assertEqual(self.deal([low], [high]).play_round().winner, "computer")
 
     def test_all_artwork_paths_exist(self):
         root = Path(__file__).resolve().parents[1] / "Pictures"

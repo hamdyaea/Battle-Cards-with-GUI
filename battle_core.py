@@ -82,10 +82,8 @@ class BattleGame:
                 winner = "computer"
                 break
             war = True
-            # Three face-down cards per player; the next card decides the war.
-            for _ in range(3):
-                if not self.player or not self.computer:
-                    break
+            # Each player stakes one hidden card before the next comparison.
+            if self.player and self.computer:
                 pile.extend((self.player.popleft(), self.computer.popleft()))
             if not self.player or not self.computer:
                 winner = "player" if self.player else "computer" if self.computer else "draw"

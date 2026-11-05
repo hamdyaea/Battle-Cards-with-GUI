@@ -45,7 +45,7 @@ class BattleWindow(tk.Tk):
         frame = ttk.Frame(self, padding=20)
         frame.pack(fill="both", expand=True)
         ttk.Label(frame, text="Battle Cards", font=("Sans", 24, "bold")).pack(pady=(0, 10))
-        ttk.Label(frame, text="Higher card wins. Ties trigger a war!").pack()
+        ttk.Label(frame, text="Ace high. On a tie, play one card face down and one face up.").pack()
         self.scores = ttk.Label(frame, font=("Sans", 14, "bold"))
         self.scores.pack(pady=12)
         cards = ttk.Frame(frame)

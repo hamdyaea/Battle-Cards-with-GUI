@@ -19,9 +19,10 @@ python battle.py
 ```
 
 Tkinter must be installed by your Linux distribution (usually `tk`).
-The interface offers **Play round** and **New game**. Higher-ranked
-cards win each round; equal ranks trigger a war with three face-down
-cards before the next comparison. The winner collects the contested cards.
+The interface offers **Play round** and **New game**. Ranks from highest to lowest are
+Ace, King, Queen, Jack, 10, 9, 8, 7, 6, 5, 4, 3, 2. On a tie, each player
+places one card face down and turns over the next. Another tie repeats this
+sequence on the same pile. The higher revealed card wins the entire pile.
 
 ## Testing
 
@@ -29,7 +30,7 @@ cards before the next comparison. The winner collects the contested cards.
 python3 -m unittest discover -s tests -v
 ```
 
-Five offline tests check all 52 card images, unique decks, conservation
+Offline tests check all 52 card images, unique decks, conservation
 of cards over thousands of rounds, tied-card wars and invalid cards.
 The Tkinter GUI was also launched, played one round and reset on Manjaro.
 
